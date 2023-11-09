@@ -25,7 +25,7 @@ function funcLoadImages(searchKeyword) {
         col.appendChild(card);
 
         const imgContainer = document.createElement("div");
-        imgContainer.style.position = "relative"; // Position container relative
+        imgContainer.style.position = "relative";
 
         const img = document.createElement("img");
         img.className = "card-img-top";
