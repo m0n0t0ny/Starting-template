@@ -50,11 +50,18 @@ function funcLoadImages(searchKeyword) {
         const cardBody = document.createElement("div");
         cardBody.className = "card-body";
 
-        if (photo.photographer) {
+        if (photo.alt) {
           const title = document.createElement("h6");
           title.className = "card-title";
-          title.textContent = `Photographer: ${photo.photographer}`;
+          title.textContent = photo.alt;
           cardBody.appendChild(title);
+        }
+
+        if (photo.photographer) {
+          const photographer = document.createElement("p");
+          photographer.className = "card-title";
+          photographer.textContent = `Photographer: ${photo.photographer}`;
+          cardBody.appendChild(photographer);
         }
 
         card.appendChild(imgContainer);
