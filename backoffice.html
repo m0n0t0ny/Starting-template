@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-md">
+            <a class="navbar-brand" href="#">CRUD Agenda</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./backoffice.html">Backoffice</a>
+                    </li>
+                </ul>
+            </div>
+    </nav>
+    <div class="container-md">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h2 class="my-4 d-inline-block">Backoffice</h2>
+                <h5 id="subtitle" class="d-inline-block"> — Crea nuovo appuntamento </h5>
+
+                <form onsubmit="handleSubmit(event)">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nome Appuntamento</label>
+                        <input type="text" class="form-control" id="name" aria-describedby="name"
+                            placeholder="Inserisci nome dell'appuntamento" required>
+                        <!-- <div id="name" class="form-text">We'll never share your email with anyone else.</div> -->
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descrizione</label>
+                        <textarea type="text" class="form-control" id="description" aria-describedby="description"
+                            placeholder="Inserisci la descrizione" required></textarea>
+                        <!-- <div id="description" class="form-text">We'll never share your email with anyone else.</div> -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Prezzo</label>
+                        <input type="number" class="form-control" id="price" aria-describedby="price" min="0"
+                            placeholder="1">
+                        <!-- <div id="price" class="form-text">We'll never share your email with anyone else.</div> -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="time" class="form-label">Data e ora</label>
+                        <input type="datetime-local" class="form-control" id="time" aria-describedby="time" required>
+                        <!-- <div id="time" class="form-text">We'll never share your email with anyone else.</div> -->
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Invia</button>
+                    <button type="button" class="btn btn-danger d-none" onclick="handleDelete()"><svg
+                            xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z" />
+                            <path
+                                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z" />
+                        </svg></button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <script>
+        // vedi pagina details.html per spiegazione delle prossime due righe
+        const params = new URLSearchParams(window.location.search)
+        const appointmentId = params.get("appId")
+
+        const URL = appointmentId ? "https://striveschool-api.herokuapp.com/api/agenda/" + appointmentId : "https://striveschool-api.herokuapp.com/api/agenda/"
+        const method = appointmentId ? "PUT" : "POST"
+
+        window.onload = () => {
+            if (appointmentId) {
+                // se siamo qui significa che abbiamo un id nella URL e siamo quindi in modalità modifica
+
+                fetch(URL)// fetch di tipo GET su endpoint con id incorporato
+                    .then(resp => resp.json())
+                    .then(resourceObj => {
+
+                        const { name, time, description, price } = resourceObj
+
+
+                        // prepopolazione campi input con valori reperiti dal server su risorsa specifica (per evitare errori di battitura)
+                        document.getElementById("name").value = name
+                        document.getElementById("time").value = time.split(".")[0]
+                        document.getElementById("description").value = description
+                        document.getElementById("price").value = price
+
+                    })
+
+
+                // cambia testo sottotitolo se siamo arrivati sulla pagina per modificare una risorsa esistente
+                document.getElementById("subtitle").innerText = " — Modifica appuntamento"
+                // modifica aspetto del bottone submit
+                const submitBtn = document.querySelector("button[type='submit']")
+                submitBtn.innerText = "Modifica"
+                submitBtn.classList.remove("btn-primary")
+                submitBtn.classList.add("btn-success")
+                //    gestione pulsante di delete
+                const deleteBtn = document.querySelector("button[type='button'].btn-danger")
+                deleteBtn.classList.remove("d-none") // abilita il bottone delete solo sulla pagina di modifica
+            }
+        }
+
+        const handleSubmit = event => {
+            event.preventDefault()
+            // creazione dell'oggetto che invieremo come payload
+            // N.B. la creazione di appointmentObj viene fatta ad ogni submit del form
+            const appointmentObj = {
+                name: document.getElementById("name").value,
+                time: document.getElementById("time").value,
+                description: document.getElementById("description").value,
+                price: document.getElementById("price").value
+            }
+
+
+            // qui l'endpoint dipende da come siamo arrivati su questa pagina, se per creazione sarà solo l'url normale, se per modifica avrà anche l'id
+            // questo è deciso dal ternary operator alla creazione della variabile "URL" in alto
+            fetch(URL, {
+                // method: method,
+                method, // uguale a scrivere method: method
+                body: JSON.stringify(appointmentObj), // è fondamentale fare la stringhifizzazione dell'oggetto nativo o invieremo "[object Object]"
+                // un header in particolare è importantissimo, il Content-Type, per specificare il formato di invio, altrimenti non verrà riconosciuto dal server
+                // l'Authorization header serve in caso di API che richiedono autenticazione tramite una API Key
+                headers: {
+                    // "Authorization" : "Bearer [YOUR API KEY]",  // metodo di autenticazione con API Key standard
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(resp => resp.json())
+                .then(createdObj => {
+                    // Aspettiamo il valore di createdObj per estrarre un'informazione nuova generata dal server ad es. l'_id
+
+                    // in base a come siamo arrivati qui, per creazione o modifica, creeremo il messaggio più appropriato alla fine della richiesta
+                    if (appointmentId) {
+                        alert("Risorsa con id: " + createdObj._id + " è stata modificata con successo!")
+                    } else {
+                        alert("Risorsa creata con successo con id: " + createdObj._id)
+                    }
+                })
+            console.log(appointmentObj)
+
+            // pulizia dei campi solo in modalità CREAZIONE (POST)
+            if (!appointmentId) {
+                document.getElementById("name").value = ""
+                document.getElementById("time").value = ""
+                document.getElementById("description").value = ""
+                document.getElementById("price").value = ""
+            }
+        }
+
+        const handleDelete = () => {
+            // chiediamo conferma all'utente di voler eliminare
+            const hasAccepted = confirm("sei sicuro di voler eliminare? (non si torna indietro)")
+
+            if (hasAccepted) {
+                // se accetta procediamo all'effettiva rimozione
+                fetch(URL, { method: "DELETE" }) // già a questo punto la risorsa è stata eliminata
+                    // aspettare con un then ci può essere utile solo per sapere esattamente quando il server ci ha risposto per avere ulteriore conferma
+                    .then(resp => resp.json())
+                    .then(deletedObj => {
+                        alert("hai eliminato " + deletedObj.name)
+                        // se non usassimo un alert qui servirebbe ritardare l'esecuzione del metodo assign di window, 
+                        // ma siccome alert è "bloccante" in questo specifico caso non occorre
+                        window.location.assign("./index.html")
+                    })
+            }
+        }
+    </script>
+</body>
+
+</html>

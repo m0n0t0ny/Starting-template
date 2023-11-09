@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-md">
+            <a class="navbar-brand" href="#">CRUD Agenda</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./backoffice.html">Backoffice</a>
+                    </li>
+
+                </ul>
+
+            </div>
+    </nav>
+    <div class="container-md">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h2 class="display-4 my-4">Appuntamenti</h2>
+                <ul class="list-group">
+
+                    <!-- questo contenuto si resetterà con un list.innerHTML = "", 
+                        di conseguenza vedremo lo spinner di caricamento solo fino alla risposta del server -->
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                    <!-- generiamo i li dinamicamente dopo aver ricevuto la risposta del server -->
+                </ul>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <script>
+        // window.onload = () => {
+
+        //     fetch("https://api.disneyapi.dev/character")
+        //         .then(resp => resp.json())
+        //         .then(charObj => console.log("Disney", charObj))
+
+        //     fetch("https://striveschool-api.herokuapp.com/api/agenda/")
+        //         .then(resp => { if (resp.ok) return resp.json() })
+        //         .then(appointments => {
+        //             console.log("fetched appointments")
+        //             // DOM MANIP.
+        //             renderLi(appointments)
+        //         })
+        //         .catch(err => console.log(err))
+
+        //     console.log("LAST LOG")
+        // }
+
+        // ASYNC / AWAIT 
+        // 1) è utilizzabile SOLO all'interno di una funzione dichiarata come async
+        // 2) il contesto di questa funzione cambia, viene valutato riga per riga fermandosi dove trova le keyword await
+        // il codice successivo è quindi "congelato" fino alla risoluzione della promise collegata alla kewyord await
+        // una volta risolta si riprende l'esecuzione del contesto come in una normale funzione sincrona
+
+        const getAppointments = async () => {
+            // una volta dichiarata una funzione come async, il suo contesto si comporterà in modo particolare.
+            // congelerà tutte le linee di codice successive alla keyword "await"
+            // anche la variabile associata al suo risultato aspetterà a crearsi e solo dopo che la Promise si sarà risolta
+            // la variabile verrà creata con l'effettivo valore di ritorno della Promise
+            // e il resto del contesto della funzione sarà libero di eseguirsi e leggere quel dato
+            try {
+                const response = await fetch("https://striveschool-api.herokuapp.com/api/agenda/")
+                console.log("RESPONSE AWAITED", response)
+
+                // il throw è come un return, interrompe in quel punto l'esecuzione del contesto della funzione
+                if (!response.ok) { throw new Error("General fetching error") }
+
+                // anche json è una Promise che va aspettata, useremo anche qui la keyword "await"
+                // per funzioni normali (sincrone) che chiamerai in questo contesto NON SERVE l'"await"
+                const appointments = await response.json()
+                console.log("APPOINTMENTS AWAITED", appointments)
+                // renderLi(appointments) // avrei potuto già chiamare renderLi per generare la lista, 
+
+                // ma se volessi mantenere questa funzione "agnostica" e farle solamente gestire il reperimento dati potrei farle 
+                // semplicemente ritornare appointments che verrà gestito nel conteto esterno (vedi in window.onload)
+                return appointments
+
+            } catch (err) {
+                // questo catch fa da gestore di errori singolo, per errori differenti che possono scaturire all'interno del contesto del try
+                console.log("getAppointments CATCH", err)
+            }
+        }
+
+        // const getDisneyChars = async () => {
+        //     try {
+        //         const disneyResp = await fetch("https://api.disneyapi.dev/character")
+        //         const charObj = await disneyResp.json()
+        //         console.log("DISNEY OBJ", charObj)
+        //     }
+        //     catch (err) {
+        //         console.log("CATCH", err)
+        //     }
+        // }
+
+        window.onload = async () => {
+            // getDisneyChars()
+
+            // APPROCCIO 1. - sfrutto il fatto che getAppointments è una Promise internamente e le aggancio un .then().catch() per leggere 
+            // internamente il valore di ritorno attraverso il parametro della callback nel then come al solito. (in questo caso non servirebbe async sulla funzione esterna)
+
+            // getAppointments().then(appointments => renderLi(appointments)).catch(err => console.log(err))
+
+            try {
+                // APPROCCIO 2. - sfrutto il contesto async/await per forzare l'attesa con un await della risoluzione della Promise getAppointments()  
+                const appointments = await getAppointments()
+                // a questo punto posso prendere appointments dalla variabile e passarlo alla funzione che renderizza la lista
+                if (appointments) { renderLi(appointments) }
+            } catch (error) {
+                console.log("ON LOAD CATCH", error)
+            }
+            // console.log("LAST LOG")
+        }
+
+        const renderLi = (arr) => {
+            // funzione classica che dovrebbe ricevere un array quando chiamata
+            if (Array.isArray(arr)) {
+                const list = document.querySelector(".list-group")
+                list.innerHTML = ""
+                arr.forEach(elem => {
+                    const li = document.createElement("li")
+                    li.className = "list-group-item d-flex align-items-center"
+                    li.innerHTML = `<span class="me-auto">${elem.name}</span> <span class="badge text-bg-dark me-2">${elem.price === 0 ? "gratis" : elem.price + "€"}</span> <a href="./details.html?appId=${elem._id}">DETTAGLI</a>`
+                    list.appendChild(li)
+                })
+            } else {
+                throw new Error("Devi passare un array alla funzione")
+            }
+        }
+
+    </script>
+</body>
+
+</html>
