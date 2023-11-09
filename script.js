@@ -2,8 +2,7 @@ function funcLoadImages(searchKeyword) {
   fetch(`https://api.pexels.com/v1/search?query=${searchKeyword}`, {
     method: "GET",
     headers: {
-      Authorization:
-        "Bearer zilYFy4tUGgCZj1EAKQ7i6rKXiMIshbnJmVeKQB1hGU7oQGIYokoAxzx"
+      Authorization: "zilYFy4tUGgCZj1EAKQ7i6rKXiMIshbnJmVeKQB1hGU7oQGIYokoAxzx"
     }
   })
     .then((response) => response.json())
@@ -25,6 +24,9 @@ function funcLoadImages(searchKeyword) {
         card.className = "card m-1 shadow-sm";
         col.appendChild(card);
 
+        const imgContainer = document.createElement("div");
+        imgContainer.style.position = "relative"; // Position container relative
+
         const img = document.createElement("img");
         img.className = "card-img-top";
         img.alt = photo.alt;
@@ -32,6 +34,18 @@ function funcLoadImages(searchKeyword) {
         img.style.width = "100%";
         img.style.height = "300px";
         img.src = photo.src.original;
+        img.onload = () => hideSpinner(spinner);
+
+        const spinner = document.createElement("div");
+        spinner.className = "spinner-border";
+        spinner.style.width = "3rem";
+        spinner.style.height = "3rem";
+        spinner.style.position = "absolute";
+        spinner.style.top = "calc(50% - 1.25rem)";
+        spinner.style.left = "calc(50% - 1.25rem)";
+
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(spinner);
 
         const cardBody = document.createElement("div");
         cardBody.className = "card-body";
@@ -43,13 +57,7 @@ function funcLoadImages(searchKeyword) {
           cardBody.appendChild(title);
         }
 
-        const button = document.createElement("button");
-        button.className = "btn btn-secondary";
-        button.innerText = "Hide";
-        button.addEventListener("click", () => hideCard(card));
-        cardBody.appendChild(button);
-
-        card.appendChild(img);
+        card.appendChild(imgContainer);
         card.appendChild(cardBody);
       });
     })
@@ -68,6 +76,6 @@ loadSecondaryImages.addEventListener("click", () => {
   funcLoadImages("cat");
 });
 
-function hideCard(card) {
-  card.classList.add("d-none");
+function hideSpinner(spinner) {
+  spinner.style.display = "none";
 }
