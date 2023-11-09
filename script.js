@@ -14,6 +14,7 @@ function funcLoadImages(searchKeyword) {
       console.log(" -----------------------------");
 
       const row = document.getElementById("row");
+      row.innerHTML = "";
 
       photos.forEach((photo) => {
         const col = document.createElement("div");
@@ -21,22 +22,19 @@ function funcLoadImages(searchKeyword) {
         row.appendChild(col);
 
         const card = document.createElement("div");
-        card.className = "card mb-4 shadow-sm h-100";
+        card.className = "card m-1 shadow-sm";
         col.appendChild(card);
+
+        const img = document.createElement("img");
+        img.className = "card-img-top";
+        img.alt = photo.alt;
+        img.style.objectFit = "cover";
+        img.style.width = "100%";
+        img.style.height = "300px";
+        img.src = photo.src.original;
 
         const cardBody = document.createElement("div");
         cardBody.className = "card-body";
-
-        if (photo.src.large) {
-          const img = document.createElement("img");
-          img.className = "card-img-top";
-          img.src = photo.src.large;
-          img.alt = photo.alt;
-          img.style.objectFit = "cover";
-          img.style.width = "100%";
-          img.style.height = "300px";
-          card.appendChild(img);
-        }
 
         if (photo.photographer) {
           const title = document.createElement("h6");
@@ -45,6 +43,7 @@ function funcLoadImages(searchKeyword) {
           cardBody.appendChild(title);
         }
 
+        card.appendChild(img);
         card.appendChild(cardBody);
       });
     })
@@ -55,10 +54,10 @@ function funcLoadImages(searchKeyword) {
 
 const loadImages = document.getElementById("load-images");
 loadImages.addEventListener("click", () => {
-  funcLoadImages("tree");
+  funcLoadImages("dog");
 });
 
 const loadSecondaryImages = document.getElementById("load-secondary-images");
 loadSecondaryImages.addEventListener("click", () => {
-  funcLoadImages("cats");
+  funcLoadImages("cat");
 });
