@@ -43,6 +43,12 @@ function funcLoadImages(searchKeyword) {
           cardBody.appendChild(title);
         }
 
+        const button = document.createElement("button");
+        button.className = "btn btn-secondary";
+        button.innerText = "Hide";
+        button.addEventListener("click", () => hideCard(card));
+        cardBody.appendChild(button);
+
         card.appendChild(img);
         card.appendChild(cardBody);
       });
@@ -61,3 +67,7 @@ const loadSecondaryImages = document.getElementById("load-secondary-images");
 loadSecondaryImages.addEventListener("click", () => {
   funcLoadImages("cat");
 });
+
+function hideCard(card) {
+  card.classList.add("d-none");
+}
